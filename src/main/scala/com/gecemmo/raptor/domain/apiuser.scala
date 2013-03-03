@@ -16,17 +16,6 @@
 
 package com.gecemmo.raptor.domain
 
-/**
- * Base type for failures
- */
-trait Failure {
-  /**
-   * The error code for the failure
-   * @return the error code
-   */
-  def code: String
-}
-
 case class NotFoundFailure(status: Int, code: Int, message: String, developerMessage: Option[String])
 
 case class ApiUserLoginAttempt(stype: String, svalue: String)
@@ -40,4 +29,4 @@ case class RegisteredApiUser(username: String, password: String)
 /**
  * Reply to unsuccessful api user login
  */
-case class NotRegisteredApiUser(code: String) extends Failure
+case class NotRegisteredApiUser(code: String)

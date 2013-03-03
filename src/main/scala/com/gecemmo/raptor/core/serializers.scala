@@ -21,7 +21,6 @@ import spray.httpx.SprayJsonSupport
 import spray.json._
 
 import com.gecemmo.raptor.domain._
-import com.gecemmo.raptor.domain.Failure
 
 /**
  * Custom protocol specifiers for Raptor domain objects
