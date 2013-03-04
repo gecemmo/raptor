@@ -24,3 +24,6 @@ case class GetApplicationById(id: String)
 
 // Users
 case class GetLoginAttemptResult(username: String, password: String)
+
+// Metrics
+case class MetricsEvent(key: String, value: Double)
