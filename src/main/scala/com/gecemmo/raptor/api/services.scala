@@ -62,7 +62,7 @@ class RaptorService(implicit val actorSystem: ActorSystem) extends Directives wi
 		path(Slash) {
 			get {
 				complete {
-					"Raptor API v0.1"
+					"Raptor API v.0.1"
 				}
 			}
 		} ~
