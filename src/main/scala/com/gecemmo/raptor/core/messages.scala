@@ -14,7 +14,7 @@
 * http://www.gecemmo.com
 */
 
-package com.gecemmo.raptor.api
+package com.gecemmo.raptor.core
 
 // Tenants
 case class GetTenantByApiKey(key: String)

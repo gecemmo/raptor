@@ -24,7 +24,6 @@ import spray.http.MediaTypes._
 import scala.concurrent.ExecutionContext.Implicits._
 
 import com.gecemmo.raptor.core._
-import com.gecemmo.raptor.domain._
 
 import CustomJsonProtocol._
 

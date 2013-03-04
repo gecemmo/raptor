@@ -14,7 +14,7 @@
 * http://www.gecemmo.com
 */
 
-package com.gecemmo.raptor.domain
+package com.gecemmo.raptor.core
 
 case class Tenant(name: String, orgNr: String)
 case class Application(name: String, version: String, description: String)

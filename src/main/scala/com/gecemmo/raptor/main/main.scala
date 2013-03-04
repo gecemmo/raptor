@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import spray.can.server.SprayCanHttpServerApp
 
 import com.gecemmo.raptor.api._
-import com.gecemmo.raptor.web._
+import com.gecemmo.raptor.core._
 
 class Application(val actorSystem: ActorSystem) extends ServerCore with Api with Web 
 

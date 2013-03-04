@@ -14,7 +14,7 @@
 * http://www.gecemmo.com
 */
 
-package com.gecemmo.raptor.domain
+package com.gecemmo.raptor.core
 
 case class NotFoundFailure(status: Int, code: Int, message: String, developerMessage: Option[String])
 

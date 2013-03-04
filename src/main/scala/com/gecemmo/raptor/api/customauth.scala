@@ -24,7 +24,7 @@ import scala.reflect.{classTag, ClassTag}
 import spray.http.{ HttpCredentials, BasicHttpCredentials}
 import scala.concurrent.ExecutionContext.Implicits._
 
-import com.gecemmo.raptor.domain.ApiUser
+import com.gecemmo.raptor.core.ApiUser
 
 /**
  * Implements custom digest based authentication

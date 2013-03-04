@@ -23,7 +23,6 @@ import scala.concurrent.ExecutionContext.Implicits._
 import spray.routing.authentication._
 import spray.httpx.marshalling;
 import com.gecemmo.raptor.core._
-import com.gecemmo.raptor.domain._
 
 /**
  * Custom matcher for generated IDs

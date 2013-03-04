@@ -17,7 +17,7 @@
 package com.gecemmo.raptor.api
 
 import spray.http.{HttpEntity, StatusCode}
-import com.gecemmo.raptor.domain.NotFoundFailure
+import com.gecemmo.raptor.core.NotFoundFailure
 
 case class ErrorResponseException(responseStatus: StatusCode, message: NotFoundFailure) extends RuntimeException
 

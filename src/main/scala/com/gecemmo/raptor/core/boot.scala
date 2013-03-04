@@ -14,7 +14,7 @@
 * http://www.gecemmo.com
 */
 
-package com.gecemmo.raptor.web
+package com.gecemmo.raptor.core
 
 import akka.actor.{Props, ActorSystem}
 import spray.io.IOExtension
@@ -22,7 +22,6 @@ import spray.can.server._
 import spray.io.{SingletonHandler, IOBridge}
 
 import com.gecemmo.raptor.api._
-import com.gecemmo.raptor.web._
 
 /**
 * Defines the trait for web service functionality

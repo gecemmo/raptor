@@ -20,8 +20,6 @@ import spray.json.DefaultJsonProtocol
 import spray.httpx.SprayJsonSupport
 import spray.json._
 
-import com.gecemmo.raptor.domain._
-
 /**
  * Custom protocol specifiers for Raptor domain objects
  */
