@@ -17,13 +17,13 @@
 package com.gecemmo.raptor.api
 
 import scala.concurrent.Future
-import spray.routing.{RequestContext, AuthenticationRequiredRejection}
+import spray.routing.{RequestContext, AuthenticationRequiredRejection, AuthenticationFailedRejection}
 import spray.routing.authentication._
 import spray.http.HttpHeaders._
 import scala.reflect.{classTag, ClassTag}
 import spray.http.{ HttpCredentials, BasicHttpCredentials}
 import scala.concurrent.ExecutionContext.Implicits._
-
+import org.specs2.mutable._
 import com.gecemmo.raptor.core.ApiUser
 
 /**
@@ -33,31 +33,33 @@ import com.gecemmo.raptor.core.ApiUser
 trait CustomAuthentication {
 	import spray.util._
 
-	private def scheme = "FS"
+	private def scheme = "RA"
 
 	private def authenticate(credentials: Option[HttpCredentials], ctx: RequestContext) = Future[Option[ApiUser]] {
 		credentials match {
-			case Some(creds) => {				
-				println(ctx)				
+			case Some(creds) => {
+				println(ctx)
 				creds.value.split("""\s+""") match {
-					case Array("Basic", digest) => println("Basic: " + digest)
 					// Extract Api id and signature (=> correct /incorrect)
 					// TODO: Add unit tests to test request signing
-					case Array("FS", digest) => println("FS: " + digest)
+					case Array("RA", digest) =>  {println("RA: " + digest); None /*(Some(ApiUser(Some("test1"), Some("test1")))*/}
+					// Reject all other authentication schemes
 					case _ => None
-				}				
-				Some(ApiUser(Some("test1"), Some("test1")))
+				}
 			}
 			case None => None
 		}
 	}
 
-	val digestAuthenticator: ContextAuthenticator[ApiUser] = { ctx =>		
+	val digestAuthenticator: ContextAuthenticator[ApiUser] = { ctx =>
 		val authHeader = ctx.request.headers.findByType[`Authorization`]
-		val credentials = authHeader.map { case Authorization(creds) => creds }		
+		val credentials = authHeader.map { case Authorization(creds) => creds }
 		authenticate(credentials, ctx) map {
 			case Some(str:ApiUser) => { println("Got from auth service: " + str); Right(str) }
-			case None => Left(AuthenticationRequiredRejection("FS", "wrong", Map.empty))
+			case None => Left {
+					if (authHeader.isEmpty) AuthenticationRequiredRejection("RA", "wrong", Map.empty)
+					else AuthenticationFailedRejection("apa")
+			}
 		}
 	}
 }
