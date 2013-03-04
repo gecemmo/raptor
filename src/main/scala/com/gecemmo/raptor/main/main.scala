@@ -14,7 +14,6 @@
 * http://www.gecemmo.com
 */
 
-
 package com.gecemmo.raptor.main
 
 import akka.actor.ActorSystem
