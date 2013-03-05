@@ -28,7 +28,7 @@ import com.gecemmo.raptor.core._
  * Custom matcher for generated IDs
  */
 object HashMatcher {
-	def regexp = """[\da-zA-Z]{12}""".r
+  def regexp = """[\da-zA-Z]{12}""".r
 }
 
 /**
@@ -36,18 +36,18 @@ object HashMatcher {
  */
 class TenantService(implicit val actorSystem: ActorSystem) extends Directives with DefaultTimeout {
 
-	def tenantActor = actorSystem.actorFor("/user/application/tenant")
-	def userActor = actorSystem.actorFor("/user/application/user")
+  def tenantActor = actorSystem.actorFor("/user/application/tenant")
+  def userActor = actorSystem.actorFor("/user/application/user")
 
-	val route = pathPrefix("v1") {
-		path("tenants" / HashMatcher.regexp) { id =>
-			get {
-				complete{
-					(tenantActor ? GetTenantByApiKey(id)).mapTo[String]
-				}
-			}
-		}
-	}
+  val route = pathPrefix("v1") {
+    path("tenants" / HashMatcher.regexp) { id =>
+      get {
+        complete{
+          (tenantActor ? GetTenantByApiKey(id)).mapTo[String]
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -56,29 +56,29 @@ class TenantService(implicit val actorSystem: ActorSystem) extends Directives wi
  */
 class RaptorService(implicit val actorSystem: ActorSystem) extends Directives with CustomAuthentication {
 
-	import CustomMarshallers._
-	
-	val route = pathPrefix("v1") {
-		path(Slash) {
-			get {
-				complete {
-					"Raptor API v.0.1"
-				}
-			}
-		} ~
-		path ("auth") {
-			authenticate(digestAuthenticator) { user =>
-				get {
-					_.complete(user)
-				}
-			}
-		} ~
-		path ("doc") {
-			get {
-				complete {
-					"docs"
-				}
-			}
-		}
-	}
+  import CustomMarshallers._
+  
+  val route = pathPrefix("v1") {
+    path(Slash) {
+      get {
+        complete {
+          "Raptor API v.0.1"
+        }
+      }
+    } ~
+    path ("auth") {
+      authenticate(digestAuthenticator) { user =>
+        get {
+          _.complete(user)
+        }
+      }
+    } ~
+    path ("doc") {
+      get {
+        complete {
+          "docs"
+        }
+      }
+    }
+  }
 }

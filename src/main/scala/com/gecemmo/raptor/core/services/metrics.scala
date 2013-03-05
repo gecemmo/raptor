@@ -49,7 +49,7 @@ object SampleSetting {
 */
 class MetricsActor() extends Actor with DefaultTimeout with TenantOperations {
 
- 	val config = new Configuration();
+  val config = new Configuration();
   val eventType = new HashMap[String, AnyRef]()
 
   eventType.put("key", classOf[String])
@@ -60,12 +60,12 @@ class MetricsActor() extends Actor with DefaultTimeout with TenantOperations {
   val expression = SampleSetting.query;
   val statement = epService.getEPAdministrator.createEPL(expression);
 
-	def receive = {
+  def receive = {
 
-		case "hello" =>
-    	sender ! "i got it, from metrics actor" 
+    case "hello" =>
+      sender ! "i got it, from metrics actor" 
 
     case MetricsEvent(key, value) =>
-   		epService.getEPRuntime.sendEvent(Map("key" -> key, "value" -> value), "MetricsEvent")
+      epService.getEPRuntime.sendEvent(Map("key" -> key, "value" -> value), "MetricsEvent")
   }
 }

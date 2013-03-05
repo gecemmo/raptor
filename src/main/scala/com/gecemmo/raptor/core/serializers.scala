@@ -38,9 +38,9 @@ object CustomJsonProtocol extends DefaultJsonProtocol {
     
     def read(value: JsValue) = {
       value.asJsObject.getFields("type", "value") match {
-	     case Seq(JsString(stype), JsString(svalue)) =>
-	       new ApiUserLoginAttempt(stype, svalue)
-	     case _ => deserializationError("ApiUserLoginAttempt expected")
+       case Seq(JsString(stype), JsString(svalue)) =>
+         new ApiUserLoginAttempt(stype, svalue)
+       case _ => deserializationError("ApiUserLoginAttempt expected")
       }
     }
   }

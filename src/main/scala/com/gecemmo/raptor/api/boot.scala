@@ -43,31 +43,31 @@ case class Stop()
  */
 class RoutedHttpService(route: Route) extends Actor with HttpService {
 
-	import CustomMarshallers._
+  import CustomMarshallers._
 
-	implicit def actorRefFactory = context
+  implicit def actorRefFactory = context
 
-	implicit val handler = ExceptionHandler.fromPF {
-		case NonFatal(ErrorResponseException(statusCode, message)) => ctx =>
+  implicit val handler = ExceptionHandler.fromPF {
+    case NonFatal(ErrorResponseException(statusCode, message)) => ctx =>
 
-			ctx.complete(statusCode, message)
+      ctx.complete(statusCode, message)
 
-		case NonFatal(e) => ctx =>
-			ctx.complete(InternalServerError)
-	}
-	
-	/* TODO: Implement custom handler and return type JSON
-	val myRejectionHandler: RejectionHandler = {
-		case AuthenticationFailedRejection(realm) :: _ =>
-			HttpResponse(Unauthorized, "Naaah, boy!!")
-		case AuthenticationRequiredRejection(a, b, c) :: _=>
-			HttpResponse(Unauthorized, "dsadsa")
-	}*/
+    case NonFatal(e) => ctx =>
+      ctx.complete(InternalServerError)
+  }
+  
+  /* TODO: Implement custom handler and return type JSON
+  val myRejectionHandler: RejectionHandler = {
+    case AuthenticationFailedRejection(realm) :: _ =>
+      HttpResponse(Unauthorized, "Naaah, boy!!")
+    case AuthenticationRequiredRejection(a, b, c) :: _=>
+      HttpResponse(Unauthorized, "dsadsa")
+  }*/
 
-	def receive = {
-		runRoute(route)(handler, RejectionHandler.Default, context,
-										RoutingSettings.Default, LoggingContext.fromActorRefFactory)
-	}
+  def receive = {
+    runRoute(route)(handler, RejectionHandler.Default, context,
+                    RoutingSettings.Default, LoggingContext.fromActorRefFactory)
+  }
 }
 
 /**
@@ -75,61 +75,61 @@ class RoutedHttpService(route: Route) extends Actor with HttpService {
  */
 class ApplicationActor extends Actor {
 
-	def receive = {
-		case GetImplementation() =>
-			val title = "raptor"
-			val version = "0.1"
-			val build = "1"
-			title + " " + version	+ " " + build
+  def receive = {
+    case GetImplementation() =>
+      val title = "raptor"
+      val version = "0.1"
+      val build = "1"
+      title + " " + version + " " + build
 
-		sender ! Implementation(title, version, build)
+    sender ! Implementation(title, version, build)
 
-		/**
-		 * Starts the children actors
-		 */
-		case Start() =>
-			//context.actorOf(Props(new RaptorService()), "raptorapi")
-			//context.actorOf(Props(new TenantActor()), "tenant")
+    /**
+     * Starts the children actors
+     */
+    case Start() =>
+      //context.actorOf(Props(new RaptorService()), "raptorapi")
+      //context.actorOf(Props(new TenantActor()), "tenant")
 
-			sender ! Started()
+      sender ! Started()
 
-		/**
-		 * Stops this actor and all the child actors.
-		 */
-		case Stop() =>
-			context.children.foreach(context.stop _)
-	}
+    /**
+     * Stops this actor and all the child actors.
+     */
+    case Stop() =>
+      context.children.foreach(context.stop _)
+  }
 }
 
 /**
  * Responsible for starting the main actor
  */
 trait ServerCore {
-	implicit def actorSystem: ActorSystem
-	implicit val timeout = Timeout(30000)
+  implicit def actorSystem: ActorSystem
+  implicit val timeout = Timeout(30000)
 
-	val application = actorSystem.actorOf(
-		props = Props[ApplicationActor],
-		name = "application"
-	)
+  val application = actorSystem.actorOf(
+    props = Props[ApplicationActor],
+    name = "application"
+  )
 
-	Await.ready(application ? Start(), timeout.duration)
+  Await.ready(application ? Start(), timeout.duration)
 }
 
 /**
 * REST API interface
 */
 trait Api extends RouteConcatenation {
-	this: ServerCore =>
+  this: ServerCore =>
 
-	// Combines the various service routes
-	val routes =
-	new RaptorService().route ~	
-	new TenantService().route
-	
-	def rejectionHandler: PartialFunction[scala.List[Rejection], HttpResponse] = {
-		case (rejections: List[Rejection]) => HttpResponse(StatusCodes.BadRequest)
-	}
+  // Combines the various service routes
+  val routes =
+  new RaptorService().route ~ 
+  new TenantService().route
+  
+  def rejectionHandler: PartialFunction[scala.List[Rejection], HttpResponse] = {
+    case (rejections: List[Rejection]) => HttpResponse(StatusCodes.BadRequest)
+  }
 
-	val rootService = actorSystem.actorOf(Props(new RoutedHttpService(routes)))
+  val rootService = actorSystem.actorOf(Props(new RoutedHttpService(routes)))
 }

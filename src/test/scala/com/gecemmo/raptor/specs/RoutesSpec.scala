@@ -23,16 +23,16 @@ import spray.routing.HttpService
 
 import com.gecemmo.raptor.api.RaptorService
 
-class CustomAuthenticationSpec extends Specification with Specs2RouteTest with HttpService {
-	def actorRefFactory = system // connect the DSL to the test ActorSystem
+class RoutesSpec extends Specification with Specs2RouteTest with HttpService {
+  def actorRefFactory = system // connect the DSL to the test ActorSystem
 
-	val raptorService = new RaptorService()
+  val raptorService = new RaptorService()
 
-	"the Raptor service" should {
-		"return a `Raptor API v.0.1` for GET requests to the `/v1` path" in {
-			Get("/v1") ~> raptorService.route ~> check {
-				entityAs[String] must contain("Raptor API v.0.1")
-			}
-		}
-	}
+  "the Raptor service" should {
+    "return a `Raptor API v.0.1` for GET requests to the `/v1` path" in {
+      Get("/v1") ~> raptorService.route ~> check {
+        entityAs[String] must contain("Raptor API v.0.1")
+      }
+    }
+  }
 }

@@ -35,12 +35,12 @@ trait TenantOperations {
 */
 class TenantActor() extends Actor with DefaultTimeout with TenantOperations {
 
-	def receive = {
+  def receive = {
 
-		case "hello" =>
-    	sender ! "i got it, from tenant actor"
+    case "hello" =>
+      sender ! "i got it, from tenant actor"
 
     case GetTenantByApiKey(key) =>
-    	sender ! GetTenantByApiKey()
+      sender ! GetTenantByApiKey()
   }
 }
