@@ -21,13 +21,15 @@ import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.control.NonFatal
 import spray.routing._
+import spray.routing.directives._
 import spray.http.StatusCodes._
 import spray.util.LoggingContext
 import spray._
 import routing._
-import http.{StatusCodes, HttpResponse}
+import http.{StatusCodes, HttpResponse, HttpBody, HttpEntity}
 import concurrent.Await
 import spray.routing.RejectionHandler
+import spray.http.MediaTypes._
 
 import com.gecemmo.raptor.core._
 
@@ -47,25 +49,37 @@ class RoutedHttpService(route: Route) extends Actor with HttpService {
 
   implicit def actorRefFactory = context
 
-  implicit val handler = ExceptionHandler.fromPF {
+  implicit val exceptionHandler = ExceptionHandler.fromPF {
     case NonFatal(ErrorResponseException(statusCode, message)) => ctx =>
-
+      println("NonFatal 1")
       ctx.complete(statusCode, message)
 
     case NonFatal(e) => ctx =>
+      println("NonFatal 2")
       ctx.complete(InternalServerError)
   }
-  
-  /* TODO: Implement custom handler and return type JSON
-  val myRejectionHandler: RejectionHandler = {
-    case AuthenticationFailedRejection(realm) :: _ =>
-      HttpResponse(Unauthorized, "Naaah, boy!!")
-    case AuthenticationRequiredRejection(a, b, c) :: _=>
-      HttpResponse(Unauthorized, "dsadsa")
-  }*/
+
+  def jsonify(response: HttpResponse): HttpResponse = {
+    
+    // Extract valuable info from repsonse
+    val value = response.status.value
+    val reason = response.status.reason
+    val msg = response.status.defaultMessage
+    
+    // Ad-hoc marshaller
+    // TODO: look at routeRouteResponse directive when added to milestone
+    HttpResponse(response.status, HttpBody(`application/json`, s"""{"status" : $value , "message" : "$reason", "details" : "$msg"}"""))
+  }
+
+  implicit val myRejectionHandler = RejectionHandler.fromPF {
+    case rejections => mapHttpResponse(jsonify) {
+      RejectionHandler.Default(rejections)
+    } 
+  }
+
 
   def receive = {
-    runRoute(route)(handler, RejectionHandler.Default, context,
+    runRoute(route)(exceptionHandler, myRejectionHandler, context,
                     RoutingSettings.Default, LoggingContext.fromActorRefFactory)
   }
 }
@@ -131,5 +145,5 @@ trait Api extends RouteConcatenation {
     case (rejections: List[Rejection]) => HttpResponse(StatusCodes.BadRequest)
   }
 
-  val rootService = actorSystem.actorOf(Props(new RoutedHttpService(routes)))
+  val rootService = actorSystem.actorOf(Props(new RoutedHttpService(routes)), "httpservice")
 }

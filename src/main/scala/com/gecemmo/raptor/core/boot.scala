@@ -20,7 +20,7 @@ import akka.actor.{Props, ActorSystem}
 import spray.io.IOExtension
 import spray.can.server._
 import spray.io.{SingletonHandler, IOBridge}
-
+import com.typesafe.config.{ConfigFactory, Config}
 import com.gecemmo.raptor.api._
 
 /**
@@ -29,14 +29,17 @@ import com.gecemmo.raptor.api._
 trait Web {
   this: Api with ServerCore =>
 
-    implicit def actorSystem: ActorSystem
+  implicit def actorSystem: ActorSystem
 
   val ioBridge = IOExtension(actorSystem).ioBridge()
+  val settings = ServerSettings(ConfigFactory.load)
 
   val httpServer = actorSystem.actorOf(
-    Props(new HttpServer(ioBridge, SingletonHandler(rootService))),
+    Props(new HttpServer(ioBridge, SingletonHandler(rootService), settings)),
     name = "http-server"
   )
+
+  httpServer.toString
 
   httpServer ! HttpServer.Bind("localhost", 9000)
 }

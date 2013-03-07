@@ -42,7 +42,7 @@ class TenantService(implicit val actorSystem: ActorSystem) extends Directives wi
   val route = pathPrefix("v1") {
     path("tenants" / HashMatcher.regexp) { id =>
       get {
-        complete{
+        complete {
           (tenantActor ? GetTenantByApiKey(id)).mapTo[String]
         }
       }
@@ -54,10 +54,10 @@ class TenantService(implicit val actorSystem: ActorSystem) extends Directives wi
  * Raptor routes
  * Build in functionality for raptor
  */
-class RaptorService(implicit val actorSystem: ActorSystem) extends Directives with CustomAuthentication {
+class RaptorService(implicit val actorSystem: ActorSystem) extends Directives with CustomAuthentication with DefaultTimeout {
 
   import CustomMarshallers._
-  
+
   val route = pathPrefix("v1") {
     path(Slash) {
       get {
@@ -67,16 +67,16 @@ class RaptorService(implicit val actorSystem: ActorSystem) extends Directives wi
       }
     } ~
     path ("auth") {
-      authenticate(digestAuthenticator) { user =>
+       authenticate(BasicAuth(realm = "admin area")) { user =>
         get {
-          _.complete(user)
+          _.complete("dsa")
         }
       }
     } ~
     path ("doc") {
       get {
         complete {
-          "docs"
+          "Raptor API Documentation"
         }
       }
     }

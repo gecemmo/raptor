@@ -18,6 +18,8 @@ package com.gecemmo.raptor.core
 
 case class NotFoundFailure(status: Int, code: Int, message: String, developerMessage: Option[String])
 
+case class FailureResponse(status: String, entity: String)
+
 case class ApiUserLoginAttempt(stype: String, svalue: String)
 case class ApiUser(username: Option[String], password: Option[String])
 

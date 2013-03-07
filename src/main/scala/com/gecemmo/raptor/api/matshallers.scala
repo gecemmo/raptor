@@ -32,6 +32,17 @@ import CustomJsonProtocol._
  */
 object CustomMarshallers {
   
+  implicit val FailureResponseMarshaller = 
+    Marshaller.of[FailureResponse](`application/json`) { (value, contentType, ctx) =>
+      ctx.marshalTo(HttpBody(contentType, value.toJson.prettyPrint))
+    }
+
+  implicit val FailureResponseUnmarshaller =    
+    Unmarshaller[FailureResponse](`application/json`) {
+      case HttpBody(contentType, buffer) =>
+        (new String(buffer)).asJson.convertTo[FailureResponse]
+    }
+
   implicit val UserLoginAttemptMarshaller =
     Marshaller.of[ApiUserLoginAttempt](`application/json`) { (value, contentType, ctx) =>
       ctx.marshalTo(HttpBody(contentType, value.toJson.prettyPrint))

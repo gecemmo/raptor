@@ -30,6 +30,8 @@ object CustomJsonProtocol extends DefaultJsonProtocol {
   implicit val applicationFormat = jsonFormat3(Application)  
   
   implicit val failureFormat = jsonFormat4(NotFoundFailure)
+
+  implicit val failureResponseFormat = jsonFormat2(FailureResponse)
   
   // Custom converter due do mismatches in JSON and class names (ctype/type etc)
   implicit object ApiUserLoginAttemptFormat extends RootJsonFormat[ApiUserLoginAttempt] {
