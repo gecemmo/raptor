@@ -30,6 +30,10 @@ import http.{StatusCodes, HttpResponse, HttpBody, HttpEntity}
 import concurrent.Await
 import spray.routing.RejectionHandler
 import spray.http.MediaTypes._
+import akka.actor.OneForOneStrategy
+import akka.actor.SupervisorStrategy._
+import scala.concurrent.duration._
+import akka.event.Logging
 
 import com.gecemmo.raptor.core._
 
@@ -88,6 +92,18 @@ class RoutedHttpService(route: Route) extends Actor with HttpService {
  * Main application actor responsible for service actors.
  */
 class ApplicationActor extends Actor {
+
+  val log = Logging(context.system, this)
+  override def preStart() = {
+    log.info(self.path + " started")
+  }
+
+  override val supervisorStrategy =
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+    case _: ArithmeticException => Resume
+    case _: NullPointerException => Restart
+    case _: Exception => Escalate
+  }
 
   def receive = {
     case GetImplementation() =>
