@@ -55,11 +55,11 @@ class RoutedHttpService(route: Route) extends Actor with HttpService {
 
   implicit val exceptionHandler = ExceptionHandler.fromPF {
     case NonFatal(ErrorResponseException(statusCode, message)) => ctx =>
-      println("NonFatal 1")
+      println("NonFatal 1 " + message)
       ctx.complete(statusCode, message)
 
     case NonFatal(e) => ctx =>
-      println("NonFatal 2")
+      println("NonFatal 2 " + e)
       ctx.complete(InternalServerError)
   }
 
@@ -152,11 +152,11 @@ trait ServerCore {
 trait Api extends RouteConcatenation {
   this: ServerCore =>
 
-  // Combines the various service routes
-  val routes =
-  new RaptorService().route ~ 
-  new TenantService().route
-  
+  // Combines the various service routes  
+  val services = List(new RaptorService(), new TenantService());
+  val allRoutes = services.map(_ .route)
+  val routes = allRoutes.reduceLeft(_ ~ _)
+
   def rejectionHandler: PartialFunction[scala.List[Rejection], HttpResponse] = {
     case (rejections: List[Rejection]) => HttpResponse(StatusCodes.BadRequest)
   }

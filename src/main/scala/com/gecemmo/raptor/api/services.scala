@@ -18,11 +18,22 @@ package com.gecemmo.raptor.api
 
 import akka.actor.{Props, Actor, ActorSystem}
 import akka.pattern.ask
+import akka.event.Logging._
+
 import spray.routing._
-import scala.concurrent.ExecutionContext.Implicits._
+import spray.routing.directives._
 import spray.routing.authentication._
 import spray.httpx.marshalling;
+import spray.http._
+
+import scala.concurrent.ExecutionContext.Implicits._
+
 import com.gecemmo.raptor.core._
+import com.gecemmo.raptor.core.SampleMetrics
+
+trait RaptorServiceBase {
+  def route: Route
+}
 
 /**
  * Custom matcher for generated IDs
@@ -34,7 +45,7 @@ object HashMatcher {
 /**
  * Tenant routes
  */
-class TenantService(implicit val actorSystem: ActorSystem) extends Directives with DefaultTimeout {
+class TenantService(implicit val actorSystem: ActorSystem) extends Directives with DefaultTimeout with RaptorServiceBase {
 
   def tenantActor = actorSystem.actorFor("/user/application/tenant")
   def userActor = actorSystem.actorFor("/user/application/user")
@@ -54,7 +65,7 @@ class TenantService(implicit val actorSystem: ActorSystem) extends Directives wi
  * Raptor routes
  * Build in functionality for raptor
  */
-class RaptorService(implicit val actorSystem: ActorSystem) extends Directives with CustomAuthentication with DefaultTimeout {
+class RaptorService(implicit val actorSystem: ActorSystem) extends Directives with CustomAuthentication with DefaultTimeout with RaptorServiceBase {
 
   import CustomMarshallers._
 
@@ -67,16 +78,18 @@ class RaptorService(implicit val actorSystem: ActorSystem) extends Directives wi
       }
     } ~
     path ("auth") {
-       authenticate(BasicAuth(realm = "admin area")) { user =>
+      authenticate(BasicAuth(realm = "admin area")) { user =>
         get {
           _.complete("dsa")
         }
       }
     } ~
-    path ("doc") {
-      get {
-        complete {
-          "Raptor API Documentation"
+    path ("testMetrics") {
+      SampleMetrics.time("test") {
+        get {
+          complete {           
+            "max: " + SampleMetrics.getHist("test").max + " min: " + SampleMetrics.getHist("test").min + " avg: " + SampleMetrics.getHist("test").mean
+          }
         }
       }
     }

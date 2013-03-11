@@ -75,4 +75,15 @@ object CustomMarshallers {
       case HttpBody(contentType, buffer) =>
         (new String(buffer)).asJson.convertTo[ApiUser]
     }
+
+  implicit val DoubleMarshaller = 
+    Marshaller.of[Double](`application/json`) { (value, contentType, ctx) =>
+      ctx.marshalTo(HttpBody(contentType, value.toString))
+    }
+
+  implicit val DoubleUnmarshaller = 
+    Unmarshaller[Double](`application/json`) {
+      case HttpBody(contentType, buffer) =>
+        (new String(buffer)).asJson.convertTo[Double]
+    }
 }
