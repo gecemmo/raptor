@@ -32,6 +32,4 @@ libraryDependencies ++= Seq(
   "com.espertech"        % "esper"                % "4.8.0"
 )
 
-seq(Revolver.settings: _*)
-
 parallelExecution in Test := false

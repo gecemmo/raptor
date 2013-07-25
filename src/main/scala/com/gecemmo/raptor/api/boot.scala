@@ -30,6 +30,7 @@ import concurrent.Await
 import spray.routing.RejectionHandler
 
 import com.gecemmo.raptor.core._
+import com.gecemmo.raptor.core.services.{BookActor, TenantActor}
 
 // Actor messages
 case class GetImplementation()
@@ -89,7 +90,8 @@ class ApplicationActor extends Actor {
 		 */
 		case Start() =>
 			//context.actorOf(Props(new RaptorService()), "raptorapi")
-			//context.actorOf(Props(new TenantActor()), "tenant")
+			context.actorOf(Props(new TenantActor()), "tenant")
+			context.actorOf(Props(new BookActor()), "book")
 
 			sender ! Started()
 
@@ -123,9 +125,11 @@ trait Api extends RouteConcatenation {
 	this: ServerCore =>
 
 	// Combines the various service routes
-	val routes =
-	new RaptorService().route ~	
-	new TenantService().route
+	val serviceRoutes = 
+	new TenantService().route ~
+	new BookService().route
+
+	val routes = new RaptorService().route ~ serviceRoutes
 	
 	def rejectionHandler: PartialFunction[scala.List[Rejection], HttpResponse] = {
 		case (rejections: List[Rejection]) => HttpResponse(StatusCodes.BadRequest)

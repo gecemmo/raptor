@@ -38,5 +38,11 @@ trait Web {
     name = "http-server"
   )
 
-  httpServer ! HttpServer.Bind("localhost", 9000)
+
+  // To work with Heroku
+	val host = "0.0.0.0"
+  val port = Option(System.getenv("PORT")).getOrElse("9000").toInt
+  
+
+  httpServer ! HttpServer.Bind(host, port)
 }

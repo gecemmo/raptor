@@ -64,4 +64,7 @@ object CustomMarshallers {
       case HttpBody(contentType, buffer) =>
         (new String(buffer)).asJson.convertTo[ApiUser]
     }
+
+  // Hypermedia
+  
 }

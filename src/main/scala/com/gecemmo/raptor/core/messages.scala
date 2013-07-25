@@ -19,6 +19,10 @@ package com.gecemmo.raptor.core
 // Tenants
 case class GetTenantByApiKey(key: String)
 
+// Books
+case class GetBooks()
+case class GetBooksById(id: String)
+
 // Applications
 case class GetApplicationById(id: String)
 
