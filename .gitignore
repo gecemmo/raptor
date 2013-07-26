@@ -1,4 +1,6 @@
-target/
-project/
 
+*.class
 *~
+
+project/**
+target/**

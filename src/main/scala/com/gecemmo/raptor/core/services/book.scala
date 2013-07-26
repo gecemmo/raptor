@@ -20,7 +20,27 @@ import akka.actor.{Props, Actor, ActorSystem}
 import akka.pattern.ask
 import akka.util.Timeout
 
+// ConcurrentMap, ConcurrentHashMap
+import java.util.concurrent._
+
 import com.gecemmo.raptor.core._
+
+case class Book(title: String, author: String, isbn: String)
+
+// Generic Mock DB layer
+class MockDbLayer[T] {
+
+	val db: ConcurrentMap[String, T] = new ConcurrentHashMap[String, T]
+
+	def add(id: String, t: T): String = {
+		db.putIfAbsent(id, t)
+		id
+	}
+
+	def get(id: String): T = {
+		db.get(id)
+	}
+}
 
 /**
 * Specifies all book operations.
@@ -32,11 +52,31 @@ trait BookOperations {
 	def GetBookById() = ApiUser(Some("Gecemmo AB"), Some("551122-4321"))
 }
 
+trait CRUDOperations[T] {
+
+	// Consider: BREAD
+	
+	//def GetAll() = "Get all"	
+	//def GetById() = "Get by Id"
+	
+	// Create
+	def Create(t: T) = "Create"
+
+	// Remove
+	def Read(id: String) = ApiUser(Some("Gecemmo AB"), Some("551122-4321"))
+
+	// Update
+	def Update(t: T) = "Update"
+
+	// Delete
+	def Delete(t: T) = "Update"
+}
+
 /**
 * Service actor for book operations.
 * Basic CRUD-functionality
 */
-class BookActor() extends Actor with DefaultTimeout with BookOperations {
+class BookActor() extends Actor with DefaultTimeout with CRUDOperations[Book] {
 
 	def receive = {
 
@@ -44,9 +84,6 @@ class BookActor() extends Actor with DefaultTimeout with BookOperations {
 	    	sender ! "i got it, from book actor"
 
 	    case GetBooksById(id) =>
-	    	sender ! GetBookById()
-
-	    case GetBooks() =>
-	    	sender ! GetBooks()
+	    	sender ! Read(id)
 	}
 }

@@ -30,8 +30,15 @@ object Utils {
     sha1.digest().map(0xFF & _).map { "%02x".format(_) }.foldLeft(""){_ + _}
   }
 
+  // Generate UID with standard raptor length  
   def genUID() : String = {
     val bytes = (new java.util.Date()).getTime().toString().getBytes
     sha1SumString(bytes).substring(2, 14)
+  }
+
+  // Generate UID with specified length
+  def genUID(length: Int) : String = {
+    val bytes = (new java.util.Date()).getTime().toString().getBytes
+    sha1SumString(bytes).substring(0, Math.min(length, 32))
   }
 }

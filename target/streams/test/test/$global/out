@@ -1,6 +1,0 @@
-[0m[[0mdebug[0m] [0mRunning Test com.gecemmo.specs.TenantActorSpec : subclass(false, org.specs2.specification.SpecificationStructure) with arguments [0m
-[0m[[0mdebug[0m] [0mRunning Test com.gecemmo.specs.MetricsActorSpec : subclass(false, org.specs2.specification.SpecificationStructure) with arguments [0m
-[0m[[0minfo[0m] [0mPassed: : Total 2, Failed 0, Errors 0, Passed 2, Skipped 0[0m
-[0m[[0mdebug[0m] [0mPassed tests:[0m
-[0m[[0mdebug[0m] [0m	com.gecemmo.specs.TenantActorSpec[0m
-[0m[[0mdebug[0m] [0m	com.gecemmo.specs.MetricsActorSpec[0m

@@ -19,16 +19,44 @@ package com.gecemmo.raptor.api
 import akka.actor.{Props, Actor, ActorSystem}
 import akka.pattern.ask
 import spray.routing._
+import spray.http._
+import spray.routing.directives._
 import scala.concurrent.ExecutionContext.Implicits._
 import spray.routing.authentication._
 import spray.httpx.marshalling;
+import spray.httpx.marshalling._
 import com.gecemmo.raptor.core._
+import StatusCodes._
+import spray.http.HttpHeaders._
 
 /**
  * Custom matcher for generated IDs
  */
 object HashMatcher {
 	def regexp = """[\da-zA-Z]{12}""".r
+}
+
+/**
+ * Hack to fix access for testing purposes JavaScript
+ */
+trait CrossLocationRouteDirectives extends RouteDirectives {
+
+  implicit def fromObjectCross[T: Marshaller](origin: String)(obj: T) =
+    new CompletionMagnet {
+      def route: StandardRoute = 
+        new CompletionRoute(OK, 
+              RawHeader("Access-Control-Allow-Origin", origin) :: Nil, obj)
+    }
+
+  private class CompletionRoute[T: Marshaller](status: StatusCode, 
+                                               headers: List[HttpHeader], 
+                                               obj: T)
+    extends StandardRoute {
+
+    def apply(ctx: RequestContext) {
+      ctx.complete(status, headers, obj)
+    }
+  }
 }
 
 /**
@@ -53,9 +81,11 @@ class TenantService(implicit val actorSystem: ActorSystem) extends Directives wi
 /**
  * Book routes
  */
-class BookService(implicit val actorSystem: ActorSystem) extends Directives with DefaultTimeout {
+class BookService(implicit val actorSystem: ActorSystem) extends Directives with DefaultTimeout with CrossLocationRouteDirectives {
 
 	import CustomMarshallers._
+
+	val origin = "*"
 
 	def bookActor = actorSystem.actorFor("/user/application/book")	
 
@@ -70,7 +100,9 @@ class BookService(implicit val actorSystem: ActorSystem) extends Directives with
 		path("books" / HashMatcher.regexp) { id =>
 			get {
 				complete{
-					(bookActor ? GetBooksById(id)).mapTo[ApiUser]
+					fromObjectCross(origin) {
+						(bookActor ? GetBooksById(id)).mapTo[ApiUser]
+					}
 				}
 			}
 		}
